@@ -1,4 +1,5 @@
 import 'package:build/build.dart';
+import 'package:dart_style/dart_style.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -8,7 +9,13 @@ import 'src/freezed_generator.dart';
 Builder freezed(BuilderOptions options) {
   return PartBuilder(
     [FreezedGenerator(Freezed.fromJson(options.config))],
-    formatOutput: options.config['format'] == false ? (str) => str : null,
+    formatOutput:  (str,v) {
+      if(options.config['format'] == false){
+        return str;
+      }
+
+      return DartFormatter(languageVersion: v).format('// dart format width=80\n$str');
+    },
     '.freezed.dart',
     header: '''
 // coverage:ignore-file
